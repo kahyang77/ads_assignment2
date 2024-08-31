@@ -81,7 +81,7 @@ db.student_count_per_department.aggregate([
 ]).pretty()
 
 -- Find the average marks of each department in descending order
-// db.Student_performance.aggregate([
+db.Student_performance.aggregate([
     {
         $lookup: {
             from: "Student_counseling",

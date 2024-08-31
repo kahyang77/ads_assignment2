@@ -38,6 +38,15 @@ db.Student_performance.find().pretty()
 --Create an index on Department_Name in Department_info collection--
 db.Department_info.createIndex({ Department_Name: 1 })
 
+--Create an index on Department_ID in Department_info collection 
+db.Department_info.createIndex({ Department_ID: 1 });
+
+--Create an index on Student_ID in Student_performance collection
+db.Student_performance.createIndex({ Student_ID: 1 });
+
+--Create an index on Student_ID in Student_counseling collection
+db.Student_counseling.createIndex({ Student_ID: 1 });
+
 --Create an index on Employee_ID in Employee_info collection--
 db.Employee_info.createIndex({ Employee_ID: 1 })
 
