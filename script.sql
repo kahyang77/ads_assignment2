@@ -10,29 +10,51 @@ db.createCollection("Department_info")
 db.createCollection("Employee_info")
 db.createCollection("Student_counseling")
 db.createCollection("Student_performance")
+db.createCollection("Paper_info");
 
 --import csv into the db--
-mongoimport --db university --collection Department_info --type csv --file "C:\ADDATA\dataset\university\Department_Information.csv" --headerline
-mongoimport --db university --collection Employee_info --type csv --file "C:\ADDATA\dataset\university\Employee_Information.csv" --headerline
-mongoimport --db university --collection Student_counseling --type csv --file "C:\ADDATA\dataset\university\Student_Counselling_Information.csv" --headerline
-mongoimport --db university --collection Student_performance --type csv --file "C:\ADDATA\dataset\university\Student_Performance_Data.csv" --headerline
-
-
+mongoimport --db university --collection Department_info --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Department_Information.csv" --headerline
+mongoimport --db university --collection Employee_info --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Employee_Information.csv" --headerline
+mongoimport --db university --collection Student_counselling --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Student_Counceling_Information.csv" --headerline
+mongoimport --db university --collection Student_performance --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Student_Performance_Data.csv" --headerline
 
 --show documents in db--
 db.Department_info.countDocuments()
 db.Employee_info.countDocuments()
-db.Student_counseling.countDocuments()
+db.Student_counselling.countDocuments()
 db.Student_performance.countDocuments()
+db.Paper_info.countDocuments()
+
+--migrate paper_name from Student_performance to Paper_info--
+db.Student_performance.distinct("Paper_ID").forEach(function(paper_id) {
+    var paper = db.Student_performance.findOne({ Paper_ID: paper_id });
+    if (paper) {
+        db.Paper_info.update(
+            { Paper_ID: paper_id },
+            { $set: { Paper_Name: paper.Paper_Name } },
+            { upsert: true }
+        );
+    }
+});
+
+
+--update Student_performance to remove paper_name--
+db.Student_performance.updateMany(
+    {},
+    { $unset: { Paper_Name: "" } }
+);
+
 
 --check data--
 db.Department_info.find().pretty()
 
 db.Employee_info.find().pretty()
 
-db.Student_counseling.find().pretty()
+db.Student_counselling.find().pretty()
 
 db.Student_performance.find().pretty()
+
+db.Paper_info.find().pretty()
 
 --create index--
 --Create an index on Department_Name in Department_info collection--
@@ -179,6 +201,29 @@ db.runCommand({
     validationLevel: "strict"
 });
 
+--Paper_info
+db.runCommand({
+    collMod: "Paper_info",
+    validator: {
+        $jsonSchema: {
+            bsonType: "object",
+            required: ["Paper_ID", "Paper_Name"],
+            properties: {
+                Paper_ID: {
+                    bsonType: "string",
+                    description: "must be a string and is required"
+                },
+                Paper_Name: {
+                    bsonType: "string",
+                    description: "must be a string and is required"
+                }
+            }
+        }
+    },
+    validationLevel: "strict"
+});
+
+
 --show validations of all collections--
 db.getCollectionInfos().forEach(function(collectionInfo) {
     print("Collection: " + collectionInfo.name);
@@ -196,25 +241,26 @@ db.Department_info.insertOne({
 db.Department_info.find({Department_ID:"IDEPT7783"}).pretty()
 db.Employee_info.find({ Employee_ID: "IU366351" }).pretty()
 db.Student_counseling.find({ Student_ID: "SID20183160" }).pretty()
-db.Student_performance.find({ Student_ID: "SID20183160" }).pretty()
+db.Student_performance.find({ Student_ID: "SID20183160", Paper_ID: "SEMI0022256" }).pretty()
+db.Paper_info.find({ Paper_ID: "SEMI0022256" }).pretty()
 
 
 --update--
 db.Department_info.updateOne(
-    { Department_ID: "IDEPT1234" },
+    { Department_ID: "IDEPT12345" },
     { $set: { Department_Name: "Mechanical and Aerospace Engineering" } }
 );
 
 --delete--
-db.Department_info.deleteOne({ Department_ID: "IDEPT1234" });
+db.Department_info.deleteOne({ Department_ID: "IDEPT12345" });
 
 --Aggregation--
 --count number of employees in each department--
 db.Employee_info.aggregate([
     { $group: { _id: "$Department_ID", count: { $sum: 1 } } }]);
 
-
 --find average marks for each student in student performance--
 db.Student_performance.aggregate([
   { $group: { _id: "$Student_ID", averageMarks: { $avg: "$Marks" } } }
 ])
+
