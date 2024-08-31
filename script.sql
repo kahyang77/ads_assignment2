@@ -15,13 +15,13 @@ db.createCollection("Paper_info");
 --import csv into the db--
 mongoimport --db university --collection Department_info --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Department_Information.csv" --headerline
 mongoimport --db university --collection Employee_info --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Employee_Information.csv" --headerline
-mongoimport --db university --collection Student_counselling --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Student_Counceling_Information.csv" --headerline
+mongoimport --db university --collection Student_counseling --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Student_Counceling_Information.csv" --headerline
 mongoimport --db university --collection Student_performance --type csv --file "/Users/samanthayeep/ads_assignment2/univerity/Student_Performance_Data.csv" --headerline
 
 --show documents in db--
 db.Department_info.countDocuments()
 db.Employee_info.countDocuments()
-db.Student_counselling.countDocuments()
+db.Student_counseling.countDocuments()
 db.Student_performance.countDocuments()
 db.Paper_info.countDocuments()
 
@@ -50,7 +50,7 @@ db.Department_info.find().pretty()
 
 db.Employee_info.find().pretty()
 
-db.Student_counselling.find().pretty()
+db.Student_counseling.find().pretty()
 
 db.Student_performance.find().pretty()
 
@@ -77,6 +77,9 @@ db.Student_counseling.createIndex({ Department_Admission: 1, Student_ID: 1 })
 
 --Create a compound index on Student_ID and Semester_Name in Student_performance collection
 db.Student_performance.createIndex({ Student_ID: 1, Semester_Name: 1 })
+
+--Create a compound index on Student_ID and Paper_ID in Student_performance collection
+db.Student_performance.createIndex({ Student_ID: 1, Paper_ID:1 })
 
 --validation for data insertion--
 --department
