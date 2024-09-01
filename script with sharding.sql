@@ -88,6 +88,9 @@ db.Student_performance.createIndex({ Student_ID: 1, Paper_ID:1 })
 --1st :set up first , open cmd and run cli below--
 mongos --configdb configReplSet/localhost:27019,localhost:27020,localhost:27021
 
+
+
+
 --2nd run this at a new cmd--
 mongosh --port27017
 

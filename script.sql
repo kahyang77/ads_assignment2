@@ -553,24 +553,23 @@ db.grade_distribution.find().pretty();
 
 --2.2.9 Identify Students with Over 80% Improvement in Average Marks--
 db.Student_performance.aggregate([
-    { $sort: { Student_ID: 1, Semester_Name: 1 } },  --Sort using compoiund index--
     {
         $group: {
             _id: "$Student_ID",
-            allMarks: { $push: "$Marks" } 
+            allMarks: { $push: "$Marks" }
         }
     },
     {
         $addFields: {
-            firstAverageMarks: { $avg: { $slice: ["$allMarks", 0, 1] } }, 
-            lastAverageMarks: { $avg: { $slice: ["$allMarks", -1, 1] } } 
+            firstAverageMarks: { $avg: { $slice: ["$allMarks", 0, 1] } },
+            lastAverageMarks: { $avg: { $slice: ["$allMarks", -1, 1] } }
         }
     },
     {
         $addFields: {
             improvementPercent: {
                 $cond: {
-                    if: { $ne: ["$firstAverageMarks", 0] }, 
+                    if: { $ne: ["$firstAverageMarks", 0] },
                     then: { $multiply: [{ $divide: [{ $subtract: ["$lastAverageMarks", "$firstAverageMarks"] }, "$firstAverageMarks"] }, 100] },
                     else: 0
                 }
@@ -579,8 +578,8 @@ db.Student_performance.aggregate([
     },
     {
         $match: {
-            improvementPercent: { $gte: 80 }, 
-            lastAverageMarks: { $gte: 60 } 
+            improvementPercent: { $gte: 80 },
+            lastAverageMarks: { $gte: 60 }
         }
     },
     {
@@ -600,5 +599,5 @@ db.Student_performance.aggregate([
             ImprovementPercent: "$improvementPercent"
         }
     },
-    { $sort: { ImprovementPercent: -1 } } 
+    { $sort: { ImprovementPercent: -1 } }
 ]).forEach(printjson);
